@@ -1,2 +1,0 @@
-# CQRSCodeGenerator
-CQRS Code Generator
