@@ -34,6 +34,9 @@ public class CQRSGenerator
 
         // 4.Generate Validators
         GenerateValidators(entityPath);
+
+        // 5.Generate Handlers
+        GenerateHandlers(entityPath);
     }
 
     private void CreateDirectoryStructure(string basePath)
@@ -292,4 +295,164 @@ public class Get{_entity.Name}ByIdQueryValidator : AbstractValidator<Get{_entity
         "bool" => "false",
         _ => "default"
     };
+
+    private void GenerateHandlers(string basePath)
+    {
+        string handlersPath = Path.Combine(basePath, "Handlers");
+        Directory.CreateDirectory(handlersPath);
+
+        // Command Handlers
+        GenerateCreateCommandHandler(handlersPath);
+        GenerateUpdateCommandHandler(handlersPath);
+        GenerateDeleteCommandHandler(handlersPath);
+
+        // Query Handlers
+        GenerateGetByIdQueryHandler(handlersPath);
+        GenerateGetAllQueryHandler(handlersPath);
+    }
+
+    private void GenerateCreateCommandHandler(string handlersPath)
+    {
+        var handler = $@"using MediatR;
+using {_solutionName}.Shared.Services.{_entity.Name}.Commands;
+
+namespace {_solutionName}.Shared.Services.{_entity.Name}.Handlers;
+
+public class Create{_entity.Name}CommandHandler : IRequestHandler<Create{_entity.Name}Command, Create{_entity.Name}Response>
+{{
+    
+    public Create{_entity.Name}CommandHandler()
+    {{
+        
+    }}
+
+    public async Task<Create{_entity.Name}Response> Handle(Create{_entity.Name}Command request, CancellationToken cancellationToken)
+    {{
+        // Implement your creation logic here
+        
+        return new Create{_entity.Name}Response
+        {{
+            {EntityParser.GetPrimaryKeyProperty(_entity)} = Guid.NewGuid(), // Replace this with actual ID
+            Success = true,
+            Message = ""{_entity.Name} created successfully""
+        }};
+    }}
+}}";
+
+        File.WriteAllText(Path.Combine(handlersPath, $"Create{_entity.Name}CommandHandler.cs"), handler);
+    }
+
+    private void GenerateUpdateCommandHandler(string handlersPath)
+    {
+        var handler = $@"using MediatR;
+using {_solutionName}.Shared.Services.{_entity.Name}.Commands;
+
+namespace {_solutionName}.Shared.Services.{_entity.Name}.Handlers;
+
+public class Update{_entity.Name}CommandHandler : IRequestHandler<Update{_entity.Name}Command, Update{_entity.Name}Response>
+{{
+    
+    public Update{_entity.Name}CommandHandler()
+    {{
+
+    }}
+
+    public async Task<Update{_entity.Name}Response> Handle(Update{_entity.Name}Command request, CancellationToken cancellationToken)
+    {{
+        // Implement your update logic here
+        
+        return new Update{_entity.Name}Response
+        {{
+            Success = true,
+            Message = ""{_entity.Name} updated successfully""
+        }};
+    }}
+}}";
+
+        File.WriteAllText(Path.Combine(handlersPath, $"Update{_entity.Name}CommandHandler.cs"), handler);
+    }
+
+    private void GenerateDeleteCommandHandler(string handlersPath)
+    {
+        var handler = $@"using MediatR;
+using {_solutionName}.Shared.Services.{_entity.Name}.Commands;
+
+namespace {_solutionName}.Shared.Services.{_entity.Name}.Handlers;
+
+public class Delete{_entity.Name}CommandHandler : IRequestHandler<Delete{_entity.Name}Command, Delete{_entity.Name}Response>
+{{
+    
+    public Delete{_entity.Name}CommandHandler()
+    {{
+
+    }}
+
+    public async Task<Delete{_entity.Name}Response> Handle(Delete{_entity.Name}Command request, CancellationToken cancellationToken)
+    {{
+        // Implement your delete logic here
+        
+        return new Delete{_entity.Name}Response
+        {{
+            Success = true,
+            Message = ""{_entity.Name} deleted successfully""
+        }};
+    }}
+}}";
+
+        File.WriteAllText(Path.Combine(handlersPath, $"Delete{_entity.Name}CommandHandler.cs"), handler);
+    }
+
+    private void GenerateGetByIdQueryHandler(string handlersPath)
+    {
+        var handler = $@"using MediatR;
+using {_solutionName}.Shared.Services.{_entity.Name}.Queries;
+using {_solutionName}.Shared.Services.{_entity.Name}.DTOs;
+
+namespace {_solutionName}.Shared.Services.{_entity.Name}.Handlers;
+
+public class Get{_entity.Name}ByIdQueryHandler : IRequestHandler<Get{_entity.Name}ByIdQuery, {_entity.Name}DTO>
+{{
+    
+    public Get{_entity.Name}ByIdQueryHandler()
+    {{
+
+    }}
+
+    public async Task<{_entity.Name}DTO> Handle(Get{_entity.Name}ByIdQuery request, CancellationToken cancellationToken)
+    {{
+        // Implement your get by id logic here
+        
+        return new {_entity.Name}DTO();
+    }}
+}}";
+
+        File.WriteAllText(Path.Combine(handlersPath, $"Get{_entity.Name}ByIdQueryHandler.cs"), handler);
+    }
+
+    private void GenerateGetAllQueryHandler(string handlersPath)
+    {
+        var handler = $@"using MediatR;
+using {_solutionName}.Shared.Services.{_entity.Name}.Queries;
+using {_solutionName}.Shared.Services.{_entity.Name}.DTOs;
+
+namespace {_solutionName}.Shared.Services.{_entity.Name}.Handlers;
+
+public class GetAll{_entity.Name}QueryHandler : IRequestHandler<GetAll{_entity.Name}Query, List<{_entity.Name}DTO>>
+{{
+    
+    public GetAll{_entity.Name}QueryHandler()
+    {{
+
+    }}
+
+    public async Task<List<{_entity.Name}DTO>> Handle(GetAll{_entity.Name}Query request, CancellationToken cancellationToken)
+    {{
+        // Implement your get all logic here
+        
+        return new List<{_entity.Name}DTO>();
+    }}
+}}";
+
+        File.WriteAllText(Path.Combine(handlersPath, $"GetAll{_entity.Name}QueryHandler.cs"), handler);
+    }
 }
